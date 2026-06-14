@@ -1,0 +1,81 @@
+experiment:
+  task: runtime_cost
+  pretraining_objective: full
+
+data:
+  pairs_file: data/synthetic/processed/irregular/pairs_positive_anchor_key.jsonl
+  train_singles_file: data/synthetic/splits/irregular/train.jsonl
+  valid_singles_file: data/synthetic/splits/irregular/valid.jsonl
+
+initial_graph:
+  templates_dir: runs/positive_anchor_key_mi_initialized/templates
+
+operators:
+  - type: Seq Scan
+    template_file: Seq_Scan.pkl
+    paired_epoch_size: 5632
+    device: cuda:0
+  - type: Index Scan
+    template_file: Index_Scan.pkl
+    paired_epoch_size: 3306
+    device: cuda:2
+  - type: Index Only Scan
+    template_file: Index_Only_Scan.pkl
+    paired_epoch_size: 2103
+    device: cuda:3
+  - type: Nested Loop
+    template_file: Nested_Loop.pkl
+    paired_epoch_size: 2792
+    device: cuda:4
+  - type: Hash Join
+    template_file: Hash_Join.pkl
+    paired_epoch_size: 3218
+    device: cuda:2
+  - type: Hash
+    template_file: Hash.pkl
+    paired_epoch_size: 3218
+    device: cuda:4
+  - type: Aggregate
+    template_file: Aggregate.pkl
+    paired_epoch_size: 8946
+    device: cuda:0
+  - type: Gather
+    template_file: Gather.pkl
+    paired_epoch_size: 3946
+    device: cuda:3
+
+model:
+  encoder_mode: iterative_graph
+  hidden_dim: 64
+  num_message_passing_layers: 2
+  pool_type: mean
+  projection_dim: 32
+  post_mp_layers: 2
+  post_mp_hidden_dim: 64
+  post_mp_output_dim: 32
+
+graph_learning:
+  graph_metric_type: learned_weight
+  graph_num_heads: 1
+  graph_hyper_hidden_dim: 0
+  max_iter: 10
+  inference_max_iter: 10
+
+optimization:
+  epochs: 500
+  seed: 42
+  pair_batch_size: 32
+  single_batch_size: 64
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  alpha: 1.0
+  beta: 1.0
+  gamma: 0.1
+
+pair_sampling:
+  positive_cross_condition_only: false
+  pair_group_weight: sqrt_all_pairs
+  pair_group_weight_cap: 64
+
+artifacts:
+  checkpoint_root: runs/positive_anchor_key_mi_initialized/checkpoints

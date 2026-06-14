@@ -1,0 +1,10 @@
+/tmp*
+.claude/
+.claire/
+**/__pycache__/
+*.py[cod]
+EXPERIMENT_COMMAND_LOG.md
+ds_session.txt
+qtune-gpt-session.txt
+/data/
+runs/
